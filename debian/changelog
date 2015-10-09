@@ -1,0 +1,16 @@
+fence-agents (3.1.5-2) unstable; urgency=low
+
+  * Adopted numerous changes from the fence-agents Ubuntu package in order
+    to make co-maintaining this package easier, including these changes:
+    - debian/patches/fix_manpages.patch: Fix some manpage errors.
+    - debian/lintian.overrides: Add lintian overrides.
+    Special thanks goes to Andres Rodriguez from Ubuntu!
+  * Include the files in /usr/share/cluster/relaxng/ in the package
+
+ -- Martin Loschwitz <madkiss@debian.org>  Thu, 24 Nov 2011 10:14:01 +0000
+
+fence-agents (3.1.5-1) unstable; urgency=low
+
+  * Initial release (Closes: #538203)
+
+ -- Martin Loschwitz <madkiss@debian.org>  Mon, 29 Aug 2011 12:43:41 +0000

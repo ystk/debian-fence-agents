@@ -1,0 +1,6 @@
+etc/cluster/fence*
+usr/sbin/fence*
+usr/share/cluster/fence*
+usr/share/fence*
+usr/share/man/man8/fence*
+usr/share/cluster/relaxng*

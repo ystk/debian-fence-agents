@@ -1,0 +1,39 @@
+Source: fence-agents
+Section: admin
+Priority: optional
+Maintainer: Debian HA Maintainers <debian-ha-maintainers@lists.alioth.debian.org>
+Uploaders: Martin Loschwitz <madkiss@debian.org>
+Build-Depends: autoconf,
+               automake,
+               autotools-dev,
+               debhelper (>= 7.0.50~),
+               libglib2.0-dev,
+               libnspr4-dev,
+               libnss3-dev,
+               libtool,
+               perl-modules,
+               python,
+               python-pexpect,
+               python-pycurl,
+               python-suds,
+               xsltproc
+XS-Python-Version: current
+Standards-Version: 3.9.1
+Homepage: http://sources.redhat.com/cluster/wiki/
+
+Package: fence-agents
+Architecture: any
+Depends: ${misc:Depends}, ${python:Depends}, ${shlibs:Depends}
+Replaces: cman (<= 3.0.12-2ubuntu4)
+Conflicts: cman (<= 3.0.12-2ubuntu4)
+Recommends: libnet-telnet-perl,
+            openssh-client,
+            python-pexpect,
+            python-pycurl,
+            sg3-utils,
+            snmp
+Description: Fence Agents for Red Hat Cluster
+ Red Hat Fence Agents is a collection of scripts to handle remote
+ power management for several devices.  They allow failed or
+ unreachable nodes to be forcibly restarted and removed from the
+ cluster.

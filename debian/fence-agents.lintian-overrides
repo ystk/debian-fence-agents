@@ -1,0 +1,11 @@
+fence-agents: manpage-has-errors-from-man usr/share/man/man8/fence_drac5.8.gz 47: bad argument name `)'
+fence-agents: hyphen-used-as-minus-sign usr/share/man/man8/fence_intelmodular.8.gz:9
+fence-agents: hyphen-used-as-minus-sign usr/share/man/man8/fence_ipmilan.8.gz:10
+fence-agents: hyphen-used-as-minus-sign usr/share/man/man8/fence_ipmilan.8.gz:64
+fence-agents: hyphen-used-as-minus-sign usr/share/man/man8/fence_ipmilan.8.gz:167
+fence-agents: hyphen-used-as-minus-sign usr/share/man/man8/fence_ldom.8.gz:9
+fence-agents: hyphen-used-as-minus-sign usr/share/man/man8/fence_vmware_soap.8.gz:9
+fence-agents: manpage-has-bad-whatis-entry usr/share/man/man8/fence_na.8.gz
+fence-agents: binary-without-manpage usr/sbin/fence_nss_wrapper
+fence-agents: binary-without-manpage usr/sbin/fence_vmware_helper
+fence-agents: script-not-executable usr/share/fence/fence_na.lib

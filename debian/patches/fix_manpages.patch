@@ -1,0 +1,81 @@
+Description: Fix some manpage errors
+ This patch fixes some manpages errors to avoid lintian having to
+ complain about them.
+Forwarded: not-needed
+Index: fence-agents-3.1.4/fence/agents/scsi/fence_scsi.8
+===================================================================
+--- fence-agents-3.1.4.orig/fence/agents/scsi/fence_scsi.8	2011-06-06 16:40:39.510814780 -0400
++++ fence-agents-3.1.4/fence/agents/scsi/fence_scsi.8	2011-06-06 16:48:38.191516853 -0400
+@@ -23,13 +23,13 @@
+ failed node from the device(s). The failed node will no longer be able
+ to write to the device(s). A manual reboot is required.
+ 
+-Keys are either be specified manually (see -k option) or generated
+-automatically (see -n option). Automatic key generation requires that
++Keys are either be specified manually (see \-k option) or generated
++automatically (see \-n option). Automatic key generation requires that
+ cman be running. Keys will then be generated using the cluster ID and
+ node ID such that each node has a unique key that can be determined by
+ any other node in the cluster.
+ 
+-Devices can either be specified manually (see -d option) or discovered
++Devices can either be specified manually (see \-d option) or discovered
+ automatically. Multiple devices can be specified manually by using a
+ comma-separated list. If no devices are specified, the fence_scsi
+ agent will attempt to discover devices by looking for cluster volumes
+@@ -42,7 +42,7 @@
+ .TP
+ \fB-o\fP \fIaction\fR
+ Fencing action. This value can be "on", "off", or "status". All
+-actions require either a key (see -k option) or node name (see -n
++actions require either a key (see \-k option) or node name (see \-n
+ option). For "on", the agent will attempt to register with the
+ device(s) and create a reservation if none exists. The "off" action
+ will attempt to remove a node's key from the device(s). The "status"
+@@ -61,7 +61,7 @@
+ \fB-n\fP \fInodename\fR
+ Name of the node to be fenced. The node name is used to generate the
+ key value used for the current operation. This option will be ignored
+-when used with the -k option.
++when used with the \-k option.
+ .TP
+ \fB-k\fP \fIkey\fR
+ Key to use for the current operation. This key should be unique to a
+@@ -88,19 +88,19 @@
+ This option is used by fence_node(8) and is ignored by fence_scsi.
+ .TP
+ \fInodename = "param"\fR
+-Same as -n option.
++Same as \-n option.
+ .TP
+ \fIaction = "param" \fR
+-Same as -o option.
++Same as \-o option.
+ .TP
+ \fIdevices = "param"\fR
+-Same as -d option.
++Same as \-d option.
+ .TP
+ \fIlogfile = "param"\fR
+-Same as -f option
++Same as \-f option
+ .TP
+ \fIkey = "param"\fR
+-Same as -k option.
++Same as \-k option.
+ .TP
+ \fIaptpl = "1"
+ Enable the APTPL flag. Default is 0 (disable).
+Index: fence-agents-3.1.4/fence/agents/drac/fence_drac.8
+===================================================================
+--- fence-agents-3.1.4.orig/fence/agents/drac/fence_drac.8	2011-06-06 16:47:02.811376958 -0400
++++ fence-agents-3.1.4/fence/agents/drac/fence_drac.8	2011-06-06 16:47:28.151414125 -0400
+@@ -16,7 +16,7 @@
+ interface, you will need to use the racadm command in the racser-devel rpm 
+ available from Dell.  To enable telnet on the DRAC:
+ 
+-[root]# racadm config -g cfgSerial -o cfgSerialTelnetEnable 1
++[root]# racadm config \-g cfgSerial \-o cfgSerialTelnetEnable 1
+ 
+ [root]# racadm racreset
+ 

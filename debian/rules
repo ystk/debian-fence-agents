@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+BUILDROOT := $(shell pwd)
+
+get-orig-source:
+	uscan --noconf --force-download --rename --repack --download-current-version --destdir=.
+
+%:
+	dh $@ --with python2
+
+override_dh_auto_configure:
+	#[ -f configure ] || sh autogen.sh # Use this when tarball is fixed
+	if [ -e configure -a ! -x configure ]; then chmod u+x configure; fi
+	./configure --sbindir=/usr/sbin --libexecdir=/usr/lib
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(BUILDROOT)/debian/tmp
+
+	dh_install --list-missing
