@@ -1,0 +1,109 @@
+fence-agents (4.0.22-2~bpo8+1) jessie-backports; urgency=medium
+
+  * Rebuild for jessie-backports.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Mon, 14 Mar 2016 15:58:36 +0100
+
+fence-agents (4.0.22-2) unstable; urgency=medium
+
+  * Grab missing fence_zvm.h from upstream.
+  * Remove fence_zvm on non-s390x, it's a no-op anyway.
+
+ -- Christoph Berg <myon@debian.org>  Sat, 06 Feb 2016 12:34:18 +0100
+
+fence-agents (4.0.22-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Fri, 05 Feb 2016 16:55:20 +0100
+
+fence-agents (4.0.21-2) unstable; urgency=medium
+
+  * fence_scsi: Fix /sbin/vgs path.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Thu, 24 Sep 2015 13:43:17 +0200
+
+fence-agents (4.0.21-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Christoph Berg <myon@debian.org>  Sat, 12 Sep 2015 18:42:15 +0200
+
+fence-agents (4.0.19-1) unstable; urgency=medium
+
+  [ Adrian Vondendriesch ]
+  * New upstream version.
+  * Remove obsolete "fix-agents" patch. Changes are merged upstream.
+  * Add myself to uploaders.
+  * Add "--fail-missing" to debian/rules.
+  * Add fix-virsh-man-page-unexpected-special-character patch to prevent nroff
+    related lintian errors.
+
+ -- Christoph Berg <myon@debian.org>  Mon, 27 Jul 2015 20:29:03 +0200
+
+fence-agents (4.0.18-1) unstable; urgency=medium
+
+  * New upstream version.
+  * Use debian/changelog date for BUILD_DATE in scripts to make package builds
+    reproducible.
+  * Promote python-pycurl and python-pexpect to Depends, they are needed by
+    all scripts.
+  * Remove deprecated XS-Python-Version: current.
+  * Run a simple --help test on all agents.
+
+ -- Christoph Berg <myon@debian.org>  Sat, 16 May 2015 19:22:41 +0200
+
+fence-agents (4.0.17-1) unstable; urgency=medium
+
+  * New upstream version.
+    + Verifies remote SSL certificates (implemented in 4.0.12, Closes: #764801).
+      CVE-2014-0104
+    + fence_zvmip was rewritten in Python (Closes: #765191).
+  * Add python-requests and time to Build-Depends, add python-requests and
+    python-suds to Suggests (needed by fence_vmware_soap).
+  * Add dh-python to Build-Depends.
+  * Fix perl dependencies.
+  * Remove hardening-wrapper, use buildflags.mk instead.
+  * Remove obsolete lintian override file.
+  * Add autopkgtest script provided by Alexander Sosna.
+  * Add myself to Uploaders; bump Standards-Version.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Wed, 22 Apr 2015 14:18:52 +0200
+
+fence-agents (4.0.7.1-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add libxml2-utils to Build-Depends to get xmllint (Closes: #741813).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 23 Sep 2014 20:58:23 +0200
+
+fence-agents (4.0.7.1-2) unstable; urgency=medium
+
+  * New upstream release 
+  * debian/control: Bump Standards-Version 
+
+ -- Martin Loschwitz <madkiss@debian.org>  Fri, 21 Feb 2014 13:09:10 +0000
+
+fence-agents (4.0.0-1) experimental; urgency=low
+
+  * New upstream version
+  * debian/patches/fix_manpages.patch: Drop; it's included upstream now
+
+ -- Martin Loschwitz <madkiss@debian.org>  Thu, 21 Mar 2013 08:26:47 +0000
+
+fence-agents (3.1.5-2) unstable; urgency=low
+
+  * Adopted numerous changes from the fence-agents Ubuntu package in order
+    to make co-maintaining this package easier, including these changes:
+    - debian/patches/fix_manpages.patch: Fix some manpage errors.
+    - debian/lintian.overrides: Add lintian overrides.
+    Special thanks goes to Andres Rodriguez from Ubuntu!
+  * Include the files in /usr/share/cluster/relaxng/ in the package
+
+ -- Martin Loschwitz <madkiss@debian.org>  Thu, 24 Nov 2011 10:14:01 +0000
+
+fence-agents (3.1.5-1) unstable; urgency=low
+
+  * Initial release (Closes: #538203)
+
+ -- Martin Loschwitz <madkiss@debian.org>  Mon, 29 Aug 2011 12:43:41 +0000

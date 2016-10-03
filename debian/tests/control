@@ -1,0 +1,3 @@
+Depends: @
+Tests: fence-dummy
+Restrictions: allow-stderr

@@ -1,0 +1,11 @@
+--- a/tests/data/metadata/fence_scsi.xml
++++ b/tests/data/metadata/fence_scsi.xml
+@@ -101,7 +101,7 @@ The fence_scsi agent works by having eac
+ 	</parameter>
+ 	<parameter name="vgs_path" unique="0" required="0">
+ 		<getopt mixed="--vgs-path=[path]" />
+-		<content type="string" default="/usr/sbin/vgs"  />
++		<content type="string" default="/sbin/vgs"  />
+ 		<shortdesc lang="en">Path to vgs binary</shortdesc>
+ 	</parameter>
+ </parameters>

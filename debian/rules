@@ -1,0 +1,43 @@
+#!/usr/bin/make -f
+
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+export BUILD_DATE=$(shell dpkg-parsechangelog -S Date)
+
+get-orig-source:
+	uscan --noconf --force-download --rename --repack --download-current-version --destdir=.
+
+%:
+	dh $@ --with python2 --with autoreconf
+
+override_dh_autoreconf:
+	dh_autoreconf ./autogen.sh
+
+override_dh_auto_configure:
+	#[ -f configure ] || sh autogen.sh # Use this when tarball is fixed
+	if [ -e configure -a ! -x configure ]; then chmod u+x configure; fi
+	./configure \
+		--bindir=/usr/bin \
+		--sbindir=/usr/sbin \
+		--libexecdir=/usr/lib/fence-agents \
+		VGS_PATH=/sbin/vgs
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+
+override_dh_install:
+	rm -v debian/tmp/usr/share/doc/fence-agents/COPY*
+	rm -v debian/tmp/usr/share/doc/fence-agents/README.licence
+	rmdir debian/tmp/usr/share/doc/fence-agents
+ifneq ($(shell dpkg-architecture -qDEB_HOST_ARCH),s390x)
+	# remove fence_zvm because it doesn't do anything except on 390x
+	rm -v debian/tmp/usr/sbin/fence_zvm debian/tmp/usr/share/man/man8/fence_zvm.8
+endif
+	dh_install --fail-missing
+	# test agents (skip ack_manual, it doesn't have --help, skip vmware_helper, it wants VIRuntime.pm)
+	# we test in tmp after install so the .pyc files generated don't make it into the package
+	for agent in debian/tmp/usr/sbin/*; do \
+		case $${agent##*/} in fence_ack_manual|fence_vmware_helper) continue;; esac; \
+		echo "Testing $$agent"; \
+		PYTHONPATH=debian/tmp/usr/share/fence $$agent --help >/dev/null || exit; \
+	done

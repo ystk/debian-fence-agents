@@ -1,0 +1,11 @@
+--- a/fence/agents/zvm/fence_zvm.c
++++ b/fence/agents/zvm/fence_zvm.c
+@@ -853,7 +853,7 @@ usage()
+ 		"\t-T --timeout [secs]  - Time to wait for fence in seconds - currently ignored\n"
+ 		"\t--zvmsys [node]      - z/VM Node on which SMAPI server lives\n"
+ 		"\t-h --help            - Display this usage information\n");
+-	return(1);
++	return(0);
+ }
+ 
+ /**
