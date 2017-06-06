@@ -31,7 +31,7 @@ override_dh_install:
 	rmdir debian/tmp/usr/share/doc/fence-agents
 ifneq ($(shell dpkg-architecture -qDEB_HOST_ARCH),s390x)
 	# remove fence_zvm because it doesn't do anything except on 390x
-	rm -v debian/tmp/usr/sbin/fence_zvm debian/tmp/usr/share/man/man8/fence_zvm.8
+	rm -v debian/tmp/usr/sbin/fence_zvm
 endif
 	dh_install --fail-missing
 	# test agents (skip ack_manual, it doesn't have --help, skip vmware_helper, it wants VIRuntime.pm)
@@ -41,3 +41,18 @@ endif
 		echo "Testing $$agent"; \
 		PYTHONPATH=debian/tmp/usr/share/fence $$agent --help >/dev/null || exit; \
 	done
+
+override_dh_python2:
+	dh_python2
+	dh_python2 /usr/share/fence
+
+override_dh_gencontrol:
+	# extract agent descriptions for use in debian/control
+	export LC_ALL=C; \
+	( echo -n "agents="; \
+	  sed -ne 's/<resource-agent name="\(.*\)" shortdesc="\(.*\)" >/\1: \2/p' tests/data/metadata/* | \
+	  sed -e 's/\(I.O \)\?\(Fence\|Fencing\) agent for //' | \
+	  while read line; do echo -n " $$line\$${Newline}"; done ; \
+	  echo ; \
+	) >> debian/fence-agents.substvars
+	dh_gencontrol

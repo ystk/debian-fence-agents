@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 import sys
 import stat
@@ -291,8 +291,8 @@ def define_new_opts():
 		"help" : "-d, --devices=[devices]        List of devices to use for current operation",
 		"required" : "0",
 		"shortdesc" : "List of devices to use for current operation. Devices can \
-be comma-separated list of raw device (eg. /dev/sdc) or device-mapper multipath \
-devices (eg. /dev/dm-3). Each device must support SCSI-3 persistent reservations.",
+be comma-separated list of raw devices (eg. /dev/sdc). Each device must support SCSI-3 \
+persistent reservations.",
 		"order": 1
 	}
 	all_opt["nodename"] = {
@@ -432,13 +432,13 @@ def main():
 	options = check_input(device_opt, process_input(device_opt), other_conditions=True)
 
 	docs = {}
-	docs["shortdesc"] = "Fence agent for SCSI persistentl reservation"
+	docs["shortdesc"] = "Fence agent for SCSI persistent reservation"
 	docs["longdesc"] = "fence_scsi is an I/O fencing agent that uses SCSI-3 \
 persistent reservations to control access to shared storage devices. These \
 devices must support SCSI-3 persistent reservations (SPC-3 or greater) as \
 well as the \"preempt-and-abort\" subcommand.\nThe fence_scsi agent works by \
 having each node in the cluster register a unique key with the SCSI \
-devive(s). Once registered, a single node will become the reservation holder \
+device(s). Once registered, a single node will become the reservation holder \
 by creating a \"write exclusive, registrants only\" reservation on the \
 device(s). The result is that only registered nodes may write to the \
 device(s). When a node failure occurs, the fence_scsi agent will remove the \

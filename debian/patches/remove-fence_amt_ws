@@ -1,0 +1,22 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -142,6 +142,9 @@ if test "x$AGENTS_LIST" = xall; then
+ 	AGENTS_LIST=`find $srcdir/fence/agents -mindepth 2 -maxdepth 2 -name '*.py' -printf '%P ' | sed -e 's#lib/[A-Za-z_.]* ##g' -e 's#nss_wrapper/[A-Za-z_.]* ##g' -e 's#autodetect/[A-Za-z_.]* ##g'`
+ fi
+ 
++# remove fence_amt_ws because we don't have openwsman (and sblim-sfcc) in Debian
++AGENTS_LIST=$(echo $AGENTS_LIST | sed -e "s!amt_ws/fence_amt_ws.py !!")
++
+ XENAPILIB=0
+ if echo "$AGENTS_LIST" | grep -q xenapi; then
+ 	XENAPILIB=1
+@@ -163,7 +166,8 @@ AC_PYTHON_MODULE(suds, 1)
+ AC_PYTHON_MODULE(pexpect, 1)
+ AC_PYTHON_MODULE(pycurl, 1)
+ AC_PYTHON_MODULE(requests, 1)
+-AC_PYTHON_MODULE(pywsman, 1)
++# openwsman is not in Debian yet
++#AC_PYTHON_MODULE(pywsman, 1)
+ 
+ ## path to 3rd-party binaries
+ AC_PATH_PROG([IPMITOOL_PATH], [ipmitool], [/usr/bin/ipmitool])

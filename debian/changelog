@@ -1,3 +1,44 @@
+fence-agents (4.0.25-1~bpo8+1) jessie-backports; urgency=medium
+
+  * Rebuild for jessie-backports.
+
+ -- Christoph Berg <myon@debian.org>  Mon, 05 Jun 2017 09:42:12 +0200
+
+fence-agents (4.0.25-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Mon, 23 Jan 2017 11:36:48 +0100
+
+fence-agents (4.0.24-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Adrian Vondendriesch <adrian.vondendriesch@credativ.de>  Sat, 17 Sep 2016 15:56:50 +0200
+
+fence-agents (4.0.23-2) unstable; urgency=medium
+
+  * Set LC_ALL=C when sorting list of agents in the description to get
+    reproducible ordering.
+
+ -- Christoph Berg <myon@debian.org>  Thu, 07 Jul 2016 15:53:39 +0200
+
+fence-agents (4.0.23-1) unstable; urgency=medium
+
+  * New upstream version.
+  * Disable the new fence_amt_ws agent because we don't have openwsman
+    (and sblim-sfcc) in Debian yet
+  * Include list of agents in package description.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Wed, 06 Jul 2016 13:33:49 +0200
+
+fence-agents (4.0.22-3) unstable; urgency=medium
+
+  * Add dh_python2 override to compile python files. (Closes: #816270)
+
+ -- Adrian Vondendriesch <adrian.vondendriesch@credativ.de>  Sun, 13 Mar 2016 14:41:07 +0100
+
 fence-agents (4.0.22-2~bpo8+1) jessie-backports; urgency=medium
 
   * Rebuild for jessie-backports.
