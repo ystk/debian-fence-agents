@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 import sys, stat
 import logging
@@ -177,7 +177,7 @@ def set_power_status(conn, options):
     options -- options dictionary
 
     Return Value:
-    return_code -- return code (integer)
+    return_code -- action result (bool)
     """
 
     target_status = options["--action"]
@@ -200,7 +200,7 @@ def set_power_status(conn, options):
         logging.error("DETAIL: output on stdout was \"%s\"", out)
         logging.error("DETAIL: output on stderr was \"%s\"", err)
 
-    return return_code
+    return not bool(return_code)
 
 def reboot_cycle(conn, options):
     """" trigger reboot by sbd messages
@@ -210,7 +210,7 @@ def reboot_cycle(conn, options):
     options -- options dictionary
 
     Return Value:
-    return_code -- return code (integer)
+    return_code -- action result (bool)
     """
 
     plug = options["--plug"]
@@ -219,7 +219,7 @@ def reboot_cycle(conn, options):
     err = ""
 
     (return_code, out, err) = send_sbd_message(conn, options, plug, "reset")
-    return return_code
+    return not bool(return_code)
 
 def get_power_status(conn, options):
     """Returns the status of a specific node.
@@ -239,7 +239,7 @@ def get_power_status(conn, options):
 
     # We need to check if the specified plug / node a already a allocated slot
     # on the device.
-    if not nodelist.has_key(plug):
+    if plug not in nodelist:
         logging.error("node \"%s\" not found in node list", plug)
     else:
         status = nodelist[plug][1]
@@ -373,7 +373,7 @@ which can be used in environments where sbd can be used (shared storage)."
     show_docs(options, docs)
 
     # We need to check if --devices is given and not empty.
-    if not options.has_key("--devices"):
+    if "--devices" not in options:
         fail_usage("No SBD devices specified. \
                 At least one SBD device is required.")
 

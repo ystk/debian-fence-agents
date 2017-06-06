@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 import sys
 import time
@@ -45,7 +45,7 @@ def get_power_status(_, options):
 					else:
 						logging.debug("Unknown status detected from nova: " + service.state)
 					break
-		except ConnectionError as (err):
+		except requests.exception.ConnectionError as err:
 			logging.warning("Nova connection failed: " + str(err))
 	return status
 
@@ -76,42 +76,53 @@ def _server_evacuate(server, on_shared_storage):
 		}
 
 def _is_server_evacuable(server, evac_flavors, evac_images):
-    if server.flavor.get('id') in evac_flavors:
-        return True
-    if server.image.get('id') in evac_images:
-        return True
-    return False
+	if server.flavor.get('id') in evac_flavors:
+		return True
+	if server.image.get('id') in evac_images:
+		return True
+	logging.debug("Instance %s is not evacuable" % server.image.get('id'))
+	return False
 
 def _get_evacuable_flavors():
-    result = []
-    flavors = nova.flavors.list()
-    # Since the detailed view for all flavors doesn't provide the extra specs,
-    # we need to call each of the flavor to get them.
-    for flavor in flavors:
-        if flavor.get_keys().get(EVACUABLE_TAG).strip().lower() in TRUE_TAGS:
-            result.append(flavor.id)
-    return result
+	result = []
+	flavors = nova.flavors.list()
+	# Since the detailed view for all flavors doesn't provide the extra specs,
+	# we need to call each of the flavor to get them.
+	for flavor in flavors:
+		tag = flavor.get_keys().get(EVACUABLE_TAG)
+		if tag and tag.strip().lower() in TRUE_TAGS:
+			result.append(flavor.id)
+	return result
 
 def _get_evacuable_images():
-    result = []
-    images = nova.images.list(detailed=True)
-    for image in images:
-        if hasattr(image, 'metadata'):
-            if image.metadata.get(EVACUABLE_TAG).strip.lower() in TRUE_TAGS:
-                result.append(image.id)
-    return result
+	result = []
+	images = nova.images.list(detailed=True)
+	for image in images:
+		if hasattr(image, 'metadata'):
+			tag = image.metadata.get(EVACUABLE_TAG)
+			if tag and tag.strip().lower() in TRUE_TAGS:
+				result.append(image.id)
+	return result
 
 def _host_evacuate(options):
 	result = True
-	servers = nova.servers.list(search_opts={'host': options["--plug"]})
+	images = _get_evacuable_images()
+	flavors = _get_evacuable_flavors()
+	servers = nova.servers.list(search_opts={'host': options["--plug"], 'all_tenants': 1 })
+
 	if options["--instance-filtering"] == "False":
-		evacuables = servers
-	else:
-		flavors = _get_evacuable_flavors()
-		images = _get_evacuable_images()
+		logging.debug("Not evacuating anything")
+		evacuables = []
+	elif len(flavors) or len(images):
+		logging.debug("Filtering images and flavors: %s %s" % (repr(flavors), repr(images)))
 		# Identify all evacuable servers
+		logging.debug("Checking %s" % repr(servers))
 		evacuables = [server for server in servers
-			      if _is_server_evacuable(server, flavors, images)]
+				if _is_server_evacuable(server, flavors, images)]
+		logging.debug("Evacuating %s" % repr(evacuables))
+	else:
+		logging.debug("Evacuating all images and flavors")
+		evacuables = servers
 
 	if options["--no-shared-storage"] != "False":
 		on_shared_storage = False
@@ -119,6 +130,7 @@ def _host_evacuate(options):
 		on_shared_storage = True
 
 	for server in evacuables:
+		logging.debug("Processing %s" % server)
 		if hasattr(server, 'id'):
 			response = _server_evacuate(server.id, on_shared_storage)
 			if response["accepted"]:
@@ -148,7 +160,7 @@ def set_power_status(_, options):
 		return
 
 	if options["--action"] == "on":
-		if get_power_status(_, options) == "on":
+		if get_power_status(_, options) != "on":
 			# Forcing the service back up in case it was disabled
 			nova.services.enable(options["--plug"], 'nova-compute')
 			try:
@@ -156,7 +168,7 @@ def set_power_status(_, options):
 				nova.services.force_down(
 					options["--plug"], "nova-compute", force_down=False)
 			except Exception as e:
-				# In theory, if foce_down=False fails, that's for the exact
+				# In theory, if force_down=False fails, that's for the exact
 				# same possible reasons that below with force_down=True
 				# eg. either an incompatible version or an old client.
 				# Since it's about forcing back to a default value, there is
@@ -190,13 +202,97 @@ def set_power_status(_, options):
 			#
 			# Some callers (such as Pacemaker) will have a timer
 			# running and kill us if necessary
-			logging.debug("Waiting for nova to update it's internal state for %s" % options["--plug"])
+			logging.debug("Waiting for nova to update its internal state for %s" % options["--plug"])
 			time.sleep(1)
 
 	if not _host_evacuate(options):
 		sys.exit(1)
 
 	return
+
+
+def fix_domain(options):
+	domains = {}
+	last_domain = None
+
+	if nova:
+		# Find it in nova
+
+		hypervisors = nova.hypervisors.list()
+		for hypervisor in hypervisors:
+			shorthost = hypervisor.hypervisor_hostname.split('.')[0]
+
+			if shorthost == hypervisor.hypervisor_hostname:
+				# Nova is not using FQDN 
+				calculated = ""
+			else:
+				# Compute nodes are named as FQDN, strip off the hostname
+				calculated = hypervisor.hypervisor_hostname.replace(shorthost+".", "")
+
+			domains[calculated] = shorthost
+
+			if calculated == last_domain:
+				# Avoid complaining for each compute node with the same name
+				# One hopes they don't appear interleaved as A.com B.com A.com B.com
+				logging.debug("Calculated the same domain from: %s" % hypervisor.hypervisor_hostname)
+
+			elif "--domain" in options and options["--domain"] == calculated:
+				# Supplied domain name is valid 
+				return
+
+			elif "--domain" in options:
+				# Warn in case nova isn't available at some point
+				logging.warning("Supplied domain '%s' does not match the one calculated from: %s"
+					      % (options["--domain"], hypervisor.hypervisor_hostname))
+
+			last_domain = calculated
+
+	if len(domains) == 0 and "--domain" not in options:
+		logging.error("Could not calculate the domain names used by compute nodes in nova")
+
+	elif len(domains) == 1 and "--domain" not in options:
+		options["--domain"] = last_domain
+		return options["--domain"]
+
+	elif len(domains) == 1:
+		logging.error("Overriding supplied domain '%s' does not match the one calculated from: %s"
+			      % (options["--domain"], hypervisor.hypervisor_hostname))
+		options["--domain"] = last_domain
+		return options["--domain"]
+
+	elif len(domains) > 1:
+		logging.error("The supplied domain '%s' did not match any used inside nova: %s"
+			      % (options["--domain"], repr(domains)))
+		sys.exit(1)
+
+	return None
+
+def fix_plug_name(options):
+	if options["--action"] == "list":
+		return
+
+	if "--plug" not in options:
+		return
+
+	calculated = fix_domain(options)
+	short_plug = options["--plug"].split('.')[0]
+	logging.debug("Checking target '%s' against calculated domain '%s'"% (options["--plug"], options["--domain"]))
+
+	if "--domain" not in options:
+		# Nothing supplied and nova not available... what to do... nothing
+		return
+
+	elif options["--domain"] == "":
+		# Ensure any domain is stripped off since nova isn't using FQDN
+		options["--plug"] = short_plug
+
+	elif options["--domain"] in options["--plug"]:
+		# Plug already contains the domain, don't re-add 
+		return
+
+	else:
+		# Add the domain to the plug
+		options["--plug"] = short_plug + "." + options["--domain"]
 
 def get_plugs_list(_, options):
 	result = {}
@@ -205,14 +301,42 @@ def get_plugs_list(_, options):
 		hypervisors = nova.hypervisors.list()
 		for hypervisor in hypervisors:
 			longhost = hypervisor.hypervisor_hostname
-			if options["--domain"] != "":
-				shorthost = longhost.replace("." + options["--domain"], "")
-				result[longhost] = ("", None)
-				result[shorthost] = ("", None)
-			else:
-				result[longhost] = ("", None)
+			shorthost = longhost.split('.')[0]
+			result[longhost] = ("", None)
+			result[shorthost] = ("", None)
 	return result
 
+def create_nova_connection(options):
+	global nova
+
+	try:
+		from novaclient import client
+		from novaclient.exceptions import NotAcceptable
+	except ImportError:
+		fail_usage("Nova not found or not accessible")
+
+	versions = [ "2.11", "2" ]
+	for version in versions:
+		nova = client.Client(version,
+				     options["--username"],
+				     options["--password"],
+				     options["--tenant-name"],
+				     options["--auth-url"],
+				     insecure=options["--insecure"],
+				     region_name=options["--region-name"],
+				     endpoint_type=options["--endpoint-type"],
+				     http_log_debug=options.has_key("--verbose"))
+		try:
+			nova.hypervisors.list()
+			return
+
+		except NotAcceptable as e:
+			logging.warning(e)
+
+		except Exception as e:
+			logging.warning("Nova connection failed. %s: %s" % (e.__class__.__name__, e))
+			
+	fail_usage("Couldn't obtain a supported connection to nova, tried: %s" % repr(versions))
 
 def define_new_opts():
 	all_opt["endpoint-type"] = {
@@ -236,11 +360,29 @@ def define_new_opts():
 	all_opt["auth-url"] = {
 		"getopt" : "k:",
 		"longopt" : "auth-url",
-		"help" : "-k, --auth-url=[tenant]        Keystone Admin Auth URL",
+		"help" : "-k, --auth-url=[url]           Keystone Admin Auth URL",
 		"required" : "0",
 		"shortdesc" : "Keystone Admin Auth URL",
 		"default" : "",
 		"order": 1,
+	}
+	all_opt["region-name"] = {
+		"getopt" : "",
+		"longopt" : "region-name",
+		"help" : "--region-name=[region]         Region Name",
+		"required" : "0",
+		"shortdesc" : "Region Name",
+		"default" : "",
+		"order": 1,
+	}
+	all_opt["insecure"] = {
+		"getopt" : "",
+		"longopt" : "insecure",
+		"help" : "--insecure                     Explicitly allow agent to perform \"insecure\" TLS (https) requests",
+		"required" : "0",
+		"shortdesc" : "Allow Insecure TLS Requests",
+		"default" : "False",
+		"order": 2,
 	}
 	all_opt["domain"] = {
 		"getopt" : "d:",
@@ -248,7 +390,6 @@ def define_new_opts():
 		"help" : "-d, --domain=[string]          DNS domain in which hosts live, useful when the cluster uses short names and nova uses FQDN",
 		"required" : "0",
 		"shortdesc" : "DNS domain in which hosts live",
-		"default" : "",
 		"order": 5,
 	}
 	all_opt["record-only"] = {
@@ -263,10 +404,10 @@ def define_new_opts():
 	all_opt["instance-filtering"] = {
 		"getopt" : "",
 		"longopt" : "instance-filtering",
-		"help" : "--instance-filtering           Only evacuate instances create from images and flavors with evacuable=true",
+		"help" : "--instance-filtering           Allow instances created from images and flavors with evacuable=true to be evacuated (or all if no images/flavors have been tagged)",
 		"required" : "0",
-		"shortdesc" : "Only evacuate flagged instances",
-		"default" : "False",
+		"shortdesc" : "Allow instances to be evacuated",
+		"default" : "True",
 		"order": 5,
 	}
 	all_opt["no-shared-storage"] = {
@@ -281,12 +422,11 @@ def define_new_opts():
 
 def main():
 	global override_status
-	global nova
 	atexit.register(atexit_handler)
 
 	device_opt = ["login", "passwd", "tenant-name", "auth-url", "fabric_fencing", "on_target",
 		"no_login", "no_password", "port", "domain", "no-shared-storage", "endpoint-type",
-		"record-only", "instance-filtering"]
+		"record-only", "instance-filtering", "insecure", "region-name"]
 	define_new_opts()
 	all_opt["shell_timeout"]["default"] = "180"
 
@@ -298,22 +438,16 @@ def main():
 	docs["vendorurl"] = ""
 
 	show_docs(options, docs)
-
-	run_delay(options)
-
-	try:
-		from novaclient import client as nova_client
-	except ImportError:
-		fail_usage("nova not found or not accessible")
-
-	# Potentially we should make this a pacemaker feature
-	if options["--action"] != "list" and options["--domain"] != "" and options.has_key("--plug"):
-		options["--plug"] = options["--plug"] + "." + options["--domain"]
-
+	
 	if options["--record-only"] in [ "2", "Disabled", "disabled" ]:
 		sys.exit(0)
 
-	elif options["--record-only"] in [ "1", "True", "true", "Yes", "yes"]:
+	run_delay(options)
+
+	create_nova_connection(options)
+
+	fix_plug_name(options)
+	if options["--record-only"] in [ "1", "True", "true", "Yes", "yes"]:
 		if options["--action"] == "on":
 			set_attrd_status(options["--plug"], "no", options)
 			sys.exit(0)
@@ -324,14 +458,6 @@ def main():
 
 		elif options["--action"] in ["monitor", "status"]:
 			sys.exit(0)
-
-	# The first argument is the Nova client version
-	nova = nova_client.Client('2',
-		options["--username"],
-		options["--password"],
-		options["--tenant-name"],
-		options["--auth-url"],
-		endpoint_type=options["--endpoint-type"])
 
 	if options["--action"] in ["off", "reboot"]:
 		# Pretend we're 'on' so that the fencing library will always call set_power_status(off)

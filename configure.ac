@@ -6,7 +6,7 @@ AC_INIT([fence-agents],
 	m4_esyscmd([make/git-version-gen .tarball-version]),
 	[linux-cluster@redhat.com])
 
-AM_INIT_AUTOMAKE([-Wno-portability dist-bzip2 dist-xz])
+AM_INIT_AUTOMAKE([-Wno-portability dist-bzip2 dist-xz subdir-objects])
 
 LT_PREREQ([2.2.6])
 LT_INIT
@@ -139,7 +139,7 @@ if test "x$AGENTS_LIST" != xall; then
 fi
 
 if test "x$AGENTS_LIST" = xall; then
-	AGENTS_LIST=`find $srcdir/fence/agents -mindepth 2 -maxdepth 2 -name Makefile.am -printf '%h ' | sed -e 's#'$srcdir'/fence/agents/##g' -e 's#lib ##g' -e 's#nss_wrapper ##g'`
+	AGENTS_LIST=`find $srcdir/fence/agents -mindepth 2 -maxdepth 2 -name '*.py' -printf '%P ' | sed -e 's#lib/[A-Za-z_.]* ##g' -e 's#nss_wrapper/[A-Za-z_.]* ##g' -e 's#autodetect/[A-Za-z_.]* ##g'`
 fi
 
 XENAPILIB=0
@@ -153,13 +153,21 @@ LOGDIR=${localstatedir}/log/cluster
 CLUSTERVARRUN=${localstatedir}/run/cluster
 CLUSTERDATA=${datadir}/cluster
 
+AM_PATH_PYTHON
+if test -z "$PYTHON"; then
+    echo "*** Essential program python not found" 1>&2
+    exit 1
+fi
+
 AC_PYTHON_MODULE(suds, 1)
 AC_PYTHON_MODULE(pexpect, 1)
 AC_PYTHON_MODULE(pycurl, 1)
 AC_PYTHON_MODULE(requests, 1)
+AC_PYTHON_MODULE(pywsman, 1)
 
 ## path to 3rd-party binaries
 AC_PATH_PROG([IPMITOOL_PATH], [ipmitool], [/usr/bin/ipmitool])
+AC_PATH_PROG([OPENSTACK_PATH], [openstack], [/usr/bin/openstack])
 AC_PATH_PROG([AMTTOOL_PATH], [amttool], [/usr/bin/amttool])
 AC_PATH_PROG([GNUTLSCLI_PATH], [gnutlscli], [/usr/bin/gnutls-cli])
 AC_PATH_PROG([COROSYNC_CMAPCTL_PATH], [corosync-cmapctl], [/usr/sbin/corosync-cmapctl])
@@ -176,6 +184,7 @@ AC_PATH_PROG([SNMPWALK_PATH], [snmpwalk], [/usr/bin/snmpwalk])
 AC_PATH_PROG([SNMPSET_PATH], [snmpset], [/usr/bin/snmpset])
 AC_PATH_PROG([SNMPGET_PATH], [snmpget], [/usr/bin/snmpget])
 AC_PATH_PROG([NOVA_PATH], [nova], [/usr/bin/nova])
+AC_PATH_PROG([POWERMAN_PATH], [powerman], [/usr/bin/powerman])
 
 ## do subst
 
@@ -202,11 +211,13 @@ AC_SUBST([AGENTS_LIST])
 AM_CONDITIONAL(BUILD_XENAPILIB, test $XENAPILIB -eq 1)
 
 AC_SUBST([IPMITOOL_PATH])
+AC_SUBST([OPENSTACK_PATH])
 AC_SUBST([AMTTOOL_PATH])
 AC_SUBST([COROSYNC_CMAPCTL_PATH])
 AC_SUBST([SG_PERSIST_PATH])
 AC_SUBST([SG_TURS_PATH])
 AC_SUBST([VGS_PATH])
+AC_SUBST([POWERMAN_PATH])
 
 ## *FLAGS handling
 
@@ -268,57 +279,7 @@ LDFLAGS="$ENV_LDFLAGS"
 AC_CONFIG_FILES([Makefile
 		 fence/Makefile
 		 fence/agents/Makefile
-		 fence/agents/alom/Makefile
-		 fence/agents/apc/Makefile
-		 fence/agents/apc_snmp/Makefile
-		 fence/agents/amt/Makefile 
-		 fence/agents/bladecenter/Makefile
-		 fence/agents/brocade/Makefile
-		 fence/agents/cisco_mds/Makefile
-		 fence/agents/cisco_ucs/Makefile
-		 fence/agents/compute/Makefile
-		 fence/agents/docker/Makefile
-		 fence/agents/drac/Makefile
-		 fence/agents/drac5/Makefile
-		 fence/agents/dummy/Makefile
-		 fence/agents/eaton_snmp/Makefile
-		 fence/agents/emerson/Makefile
-		 fence/agents/eps/Makefile
-		 fence/agents/hpblade/Makefile
-		 fence/agents/ibmblade/Makefile
-		 fence/agents/ipdu/Makefile
-		 fence/agents/ifmib/Makefile
-		 fence/agents/ilo/Makefile
-		 fence/agents/ilo_moonshot/Makefile
-		 fence/agents/ilo_mp/Makefile
-		 fence/agents/ilo_ssh/Makefile
-		 fence/agents/intelmodular/Makefile
-		 fence/agents/ipmilan/Makefile
-		 fence/agents/kdump/Makefile
-		 fence/agents/ldom/Makefile
 		 fence/agents/lib/Makefile
-		 fence/agents/lpar/Makefile
-		 fence/agents/manual/Makefile
-		 fence/agents/mpath/Makefile
-		 fence/agents/netio/Makefile
-		 fence/agents/ovh/Makefile
-		 fence/agents/pve/Makefile
-		 fence/agents/raritan/Makefile
-		 fence/agents/rcd_serial/Makefile
-		 fence/agents/rhevm/Makefile
-		 fence/agents/rsa/Makefile
-		 fence/agents/rsb/Makefile
-		 fence/agents/sbd/Makefile
-		 fence/agents/sanbox2/Makefile
-		 fence/agents/scsi/Makefile
-		 fence/agents/vbox/Makefile
-		 fence/agents/virsh/Makefile
-		 fence/agents/vmware/Makefile
-		 fence/agents/vmware_soap/Makefile
-		 fence/agents/wti/Makefile
-		 fence/agents/xenapi/Makefile
-		 fence/agents/hds_cb/Makefile
-		 fence/agents/zvm/Makefile
 		 doc/Makefile])
 
 AC_OUTPUT

@@ -9,7 +9,7 @@
 		<shortdesc lang="en">Fencing action</shortdesc>
 	</parameter>
 	<parameter name="auth-url" unique="0" required="0">
-		<getopt mixed="-k, --auth-url=[tenant]" />
+		<getopt mixed="-k, --auth-url=[url]" />
 		<content type="string" default=""  />
 		<shortdesc lang="en">Keystone Admin Auth URL</shortdesc>
 	</parameter>
@@ -38,20 +38,30 @@
 		<content type="string"  />
 		<shortdesc lang="en">Physical plug number on device, UUID or identification of machine</shortdesc>
 	</parameter>
+	<parameter name="region-name" unique="0" required="0">
+		<getopt mixed="--region-name=[region]" />
+		<content type="boolean" default=""  />
+		<shortdesc lang="en">Region Name</shortdesc>
+	</parameter>
 	<parameter name="tenant-name" unique="0" required="0">
 		<getopt mixed="-t, --tenant-name=[tenant]" />
 		<content type="string" default=""  />
 		<shortdesc lang="en">Keystone Admin Tenant</shortdesc>
 	</parameter>
+	<parameter name="insecure" unique="0" required="0">
+		<getopt mixed="--insecure" />
+		<content type="boolean" default="False"  />
+		<shortdesc lang="en">Allow Insecure TLS Requests</shortdesc>
+	</parameter>
 	<parameter name="domain" unique="0" required="0">
 		<getopt mixed="-d, --domain=[string]" />
-		<content type="string" default=""  />
+		<content type="string"  />
 		<shortdesc lang="en">DNS domain in which hosts live</shortdesc>
 	</parameter>
 	<parameter name="instance-filtering" unique="0" required="0">
 		<getopt mixed="--instance-filtering" />
-		<content type="boolean" default="False"  />
-		<shortdesc lang="en">Only evacuate flagged instances</shortdesc>
+		<content type="boolean" default="True"  />
+		<shortdesc lang="en">Allow instances to be evacuated</shortdesc>
 	</parameter>
 	<parameter name="no-shared-storage" unique="0" required="0">
 		<getopt mixed="--no-shared-storage" />
@@ -62,6 +72,11 @@
 		<getopt mixed="--record-only" />
 		<content type="string" default="False"  />
 		<shortdesc lang="en">Only record the target as needing evacuation</shortdesc>
+	</parameter>
+	<parameter name="quiet" unique="0" required="0">
+		<getopt mixed="-q, --quiet" />
+		<content type="boolean"  />
+		<shortdesc lang="en">Disable logging to stderr. Does not affect --verbose or --debug logging to syslog.</shortdesc>
 	</parameter>
 	<parameter name="verbose" unique="0" required="0">
 		<getopt mixed="-v, --verbose" />
@@ -90,32 +105,32 @@
 	</parameter>
 	<parameter name="delay" unique="0" required="0">
 		<getopt mixed="--delay=[seconds]" />
-		<content type="string" default="0"  />
+		<content type="second" default="0"  />
 		<shortdesc lang="en">Wait X seconds before fencing is started</shortdesc>
 	</parameter>
 	<parameter name="login_timeout" unique="0" required="0">
 		<getopt mixed="--login-timeout=[seconds]" />
-		<content type="string" default="5"  />
+		<content type="second" default="5"  />
 		<shortdesc lang="en">Wait X seconds for cmd prompt after login</shortdesc>
 	</parameter>
 	<parameter name="power_timeout" unique="0" required="0">
 		<getopt mixed="--power-timeout=[seconds]" />
-		<content type="string" default="20"  />
+		<content type="second" default="20"  />
 		<shortdesc lang="en">Test X seconds for status change after ON/OFF</shortdesc>
 	</parameter>
 	<parameter name="power_wait" unique="0" required="0">
 		<getopt mixed="--power-wait=[seconds]" />
-		<content type="string" default="0"  />
+		<content type="second" default="0"  />
 		<shortdesc lang="en">Wait X seconds after issuing ON/OFF</shortdesc>
 	</parameter>
 	<parameter name="shell_timeout" unique="0" required="0">
 		<getopt mixed="--shell-timeout=[seconds]" />
-		<content type="string" default="180"  />
+		<content type="second" default="180"  />
 		<shortdesc lang="en">Wait X seconds for cmd prompt after issuing command</shortdesc>
 	</parameter>
 	<parameter name="retry_on" unique="0" required="0">
 		<getopt mixed="--retry-on=[attempts]" />
-		<content type="string" default="1"  />
+		<content type="integer" default="1"  />
 		<shortdesc lang="en">Count of attempts to retry power on</shortdesc>
 	</parameter>
 </parameters>

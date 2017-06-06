@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 import sys, re, os
 import atexit
@@ -14,67 +14,80 @@ BUILD_DATE=""
 #END_VERSION_GENERATION
 
 def get_power_status(_, options):
-	output = run_command(options, create_command(options, "status"))
+	output = _run_command(options, "status")
 	match = re.search('[Cc]hassis [Pp]ower is [\\s]*([a-zA-Z]{2,3})', str(output))
 	status = match.group(1) if match else None
 	return status
 
 def set_power_status(_, options):
-	run_command(options, create_command(options, options["--action"]))
+	_run_command(options, options["--action"])
 	return
 
 def reboot_cycle(_, options):
-	output = run_command(options, create_command(options, "cycle"))
+	output = _run_command(options, "cycle")
 	return bool(re.search('chassis power control: cycle', str(output).lower()))
 
 def reboot_diag(_, options):
-	output = run_command(options, create_command(options, "diag"))
+	output = _run_command(options, "diag")
 	return bool(re.search('chassis power control: diag', str(output).lower()))
 
+def _run_command(options, action):
+	cmd, log_cmd = create_command(options, action)
+	return run_command(options, cmd, log_command=log_cmd)
+
 def create_command(options, action):
-	cmd = options["--ipmitool-path"]
+	class Cmd:
+		cmd = ""
+		log = ""
+
+		@classmethod
+		def append(cls, cmd, log=None):
+			cls.cmd += cmd
+			cls.log += (cmd if log is None else log)
+
+	# --use-sudo / -d
+	if "--use-sudo" in options:
+		Cmd.append(options["--sudo-path"] + " ")
+
+	Cmd.append(options["--ipmitool-path"])
 
 	# --lanplus / -L
-	if options.has_key("--lanplus") and options["--lanplus"] in ["", "1"]:
-		cmd += " -I lanplus"
+	if "--lanplus" in options and options["--lanplus"] in ["", "1"]:
+		Cmd.append(" -I lanplus")
 	else:
-		cmd += " -I lan"
+		Cmd.append(" -I lan")
 	# --ip / -a
-	cmd += " -H " + options["--ip"]
+	Cmd.append(" -H " + options["--ip"])
 
 	# --username / -l
-	if options.has_key("--username") and len(options["--username"]) != 0:
-		cmd += " -U " + quote(options["--username"])
+	if "--username" in options and len(options["--username"]) != 0:
+		Cmd.append(" -U " + quote(options["--username"]))
 
 	# --auth / -A
-	if options.has_key("--auth"):
-		cmd += " -A " + options["--auth"]
+	if "--auth" in options:
+		Cmd.append(" -A " + options["--auth"])
 
 	# --password / -p
-	if options.has_key("--password"):
-		cmd += " -P " + quote(options["--password"])
+	if "--password" in options:
+		Cmd.append(" -P " + quote(options["--password"]), " -P [set]")
 	else:
-		cmd += " -P ''"
+		Cmd.append(" -P ''", " -P [set]")
 
 	# --cipher / -C
 	if "--cipher" in options:
-		cmd += " -C " + options["--cipher"]
+		Cmd.append(" -C " + options["--cipher"])
 
 	# --port / -n
-	if options.has_key("--ipport"):
-		cmd += " -p " + options["--ipport"]
+	if "--ipport" in options:
+		Cmd.append(" -p " + options["--ipport"])
 
-	if options.has_key("--privlvl"):
-		cmd += " -L " + options["--privlvl"]
+	if "--privlvl" in options:
+		Cmd.append(" -L " + options["--privlvl"])
 
 	# --action / -o
-	cmd += " chassis power " + action
+	Cmd.append(" chassis power " + action)
 
-	# --use-sudo / -d
-	if options.has_key("--use-sudo"):
-		cmd = options["--sudo-path"] + " " + cmd
-
-	return cmd
+	return (Cmd.cmd, Cmd.log)
 
 def define_new_opts():
 	all_opt["lanplus"] = {
@@ -140,6 +153,9 @@ def main():
 		all_opt["lanplus"]["default"] = "1"
 
 	all_opt["ipport"]["default"] = "623"
+	all_opt["method"]["help"] = "-m, --method=[method]          Method to fence (onoff|cycle) (Default: cycle)\n" \
+				    "WARNING! This fence agent might report success before the node is powered off. " \
+				    "You should use -m/method onoff if your fence device works correctly with that option."
 
 	options = check_input(device_opt, process_input(device_opt))
 
@@ -147,7 +163,9 @@ def main():
 	docs["shortdesc"] = "Fence agent for IPMI"
 	docs["longdesc"] = "fence_ipmilan is an I/O Fencing agent\
 which can be used with machines controlled by IPMI.\
-This agent calls support software ipmitool (http://ipmitool.sf.net/)."
+This agent calls support software ipmitool (http://ipmitool.sf.net/). \
+WARNING! This fence agent might report success before the node is powered off. \
+You should use -m/method onoff if your fence device works correctly with that option."
 	docs["vendorurl"] = ""
 	docs["symlink"] = [("fence_ilo3", "Fence agent for HP iLO3"),
 		("fence_ilo4", "Fence agent for HP iLO4"),

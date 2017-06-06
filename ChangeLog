@@ -1,3 +1,565 @@
+2017-01-16  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #103 from oalbrigt/pycurl-fix-StringIO-issues
+	pycurl agents: fix StringIO issues
+
+2017-01-13  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	pycurl agents: fix StringIO issues
+
+2017-01-09  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Merge pull request #102 from ofaaland/b_powerman_path_fix
+	fence_powerman: fix typo in option powerman-path
+
+2017-01-06  Olaf Faaland  <faaland1@llnl.gov>
+
+	fence_powerman: fix typo in option powerman-path
+	References to dictionary options[] sometimes used key "powerman_path"
+	and other times "powerman-path", resulting in references to keys that
+	did not exist.
+
+	This resulted in total failure of the fence agent.
+
+	This commit makes the key used consistent.
+
+2017-01-06  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Merge pull request #101 from oalbrigt/python3-only-build
+	Fix to be able to build on Python 3 only systems
+
+2016-12-23  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Fix to be able to build on Python 3 only systems
+
+2016-12-22  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Merge pull request #98 from n3world/disableStderrLogging
+	fencing: Add option to disable logging to stderr
+
+2016-12-21  Nate Clark  <nate@neworld.us>
+
+	fencing: Add --quiet option to disable logging to stderr
+
+2016-12-13  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Merge pull request #87 from mbaldessari/fence_ironic
+	Ironic fence agent
+
+2016-12-12  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #100 from oalbrigt/travis-fix
+	travis: update Python path
+
+2016-12-12  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	travis: update Python path
+
+2016-12-12  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #99 from MSSedusch/master
+	remove getopt for new parameters for fence_azure_arm
+
+	Merge pull request #97 from n3world/specifyLogCommand
+	fencing: Specify command to be logged by run_command
+
+	Merge pull request #96 from vuntz/fix-travis
+	Fix travis issue in XML metadata introduced by 0f170a9
+
+2016-12-06  Sebastian Dusch  <sedusch@microsoft.com>
+
+	remove getopt for new parameters
+
+2016-12-01  Nate Clark  <nate@neworld.us>
+
+	fencing: Specify command to be logged by run_command
+	Currently run_command special cases the logging of commands with ipmitool and removes everything
+	between the flat -P and -p. Instead of special casing commands with ipmitool allow the caller to
+	provide the command to log so that the command can do any necessary scrubbing of the message to be
+	logged.
+
+2016-12-01  Vincent Untz  <vuntz@suse.com>
+
+	Fix travis
+	Regression introduced in 0f170a937bd0944e172004dc30df2fc240d9ca20
+
+2016-12-01  Andrew Beekhof  <andrew@beekhof.net>
+
+	Merge branch 'master' of github.com:ClusterLabs/fence-agents
+
+	compute: Fix debug message
+
+2016-11-23  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #95 from memotype/master
+	fence_vmware_soap: Suppress InsecureRequestWarning when ssl_insecure is given
+
+2016-11-21  Isaac Freeman  <memotype@gmail.com>
+
+	Suppress InsecureRequestWarning when ssl_insecure is given
+
+2016-11-14  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #84 from jnpkrn/build-m4-macro-move
+	build: fix possibly undefined macro AC_PYTHON_MODULE
+
+2016-11-10  Jan Pokorný  <jpokorny@redhat.com>
+
+	build: fix possibly undefined macro AC_PYTHON_MODULE
+	As already mentioned 2 years back by Alan Evangelista[1], fence-agents
+	project indeed uses a strange build setup, which furthermore makes it
+	impossible to pass the configure stage successfully, at least with
+	some combinations of the "autotools" programs' versions (e.g., as old
+	ones as present in RHEL 6).
+
+	Remedy is as simple as originally suggested, which also means m4
+	directory no longer needs to be reinsured in autogen.sh (though it
+	still is as a legacy), but special care must be taken with .gitignore
+	and maintainer-clean-local target of the main Makafile.
+
+	[1] https://www.redhat.com/archives/cluster-devel/2014-October/msg00161.html
+
+2016-11-10  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fencing: Remove unused Makefile.am files
+	Currently, we are using single Makefile.am in fence/agents directory.
+
+2016-11-10  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #92 from MSSedusch/master
+	fence_azure_arm: add fencing agent for Azure Resource Manager
+
+	Merge pull request #93 from ofaaland/feature-powerman-upstream
+	fence_powerman: Add powerman agent
+
+2016-11-10  Andrew Beekhof  <andrew@beekhof.net>
+
+	compute: Simpler check for nova force down compatibility
+
+2016-11-09  Olaf Faaland  <faaland1@llnl.gov>
+
+	feature powerman address review comments pass 2
+	* Set default for powerman_path in configure
+
+	* Remove unnecessary query after powerman --on or --off
+	fence_action() automatically queries power status after a power_set
+	function call, because many devices report success when the on/off
+	actually failed.
+
+	* Delay before checking powerman is executable
+	Use the provided run_delay() function to determine when a delay is
+	necessary.  Call it before testing that the powerman binary is
+	executable.  The project's sanity tests depend on this to handle the
+	missing dependency (powerman), within their testing environment.
+
+2016-11-09  Sebastian Dusch  <sedusch@microsoft.com>
+
+	fence_azure_arm: remove reboot action, remove sys.exit for setting powerstate, remove global compute_client and pass it as argument to functions
+
+2016-11-09  Marian Krcmarik  <mkrcmari@redhat.com>
+
+	compute: Ensure we can connect to nova when fixing the plug name
+
+	compute: Correctly identify when the nodename already includes the supplied domain
+
+	compute: correctly implement 'on' when the force-down API call is available
+
+	compute: Use the best available nova API version
+
+2016-11-08  Olaf Faaland  <faaland1@llnl.gov>
+
+	feature powerman address review comments pass 1
+	Removed static manpage which will be auto-generated from metadata
+	Removed unnecessary run_delay() call in main
+	Create option to set path to powerman binary
+	Verify powerman binary is executable
+	Removed redundant default ipport
+	Removed unnecessary debug logging of raw arguments
+	Removed unnecessary reboot function, implemented in a
+	  way that made it no better than the one already
+	  implemented within lib/fencing.py
+	Return value of monitor action is 'error' if powerman not running
+
+2016-11-08  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #88 from oalbrigt/fence_compute-fix-connectionerror
+	fence_compute: fix ConnectionError by using full module name
+
+2016-11-07  Olaf Faaland  <faaland1@llnl.gov>
+
+	feature-powerman Add list support and verify power state after changes
+	Add list support and change log level to error, for error messages users
+	should be made aware of.
+
+	When fencing or unfencing a node, verify the power state of the device
+	with --query before returning.  Return code from the powerman "on" or
+	"off" commands can be unreliable for some devices.
+
+2016-11-07  Michael Kit Gilbert  <gilbert32@llnl.gov>
+
+	feature-powerman add fence agent for powerman
+	Add a fence agent for powerman, https://github.com/chaos/powerman
+
+2016-11-07  Sebastian Dusch  <sedusch@microsoft.com>
+
+	fence_azure_arm: move option definitions to define_new_opts
+
+	fence_azure_arm: add fencing agent for Azure Resource Manager
+
+2016-11-02  Michele Baldessari  <michele@acksyn.org>
+
+	Ironic fence agent
+	Introduce a fence agent that plugs into OpenStack's Ironic (Bare Metal
+	as a service) service.
+
+	Testing recap:
+	1) With ironic services up and running
+	1.1) Status
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o status -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Status: ON
+
+	1.2) Power off
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o off -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Success: Powered OFF  // Machine confirmed to be off
+
+	1.3) Power on
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o on -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Success: Powered ON
+
+	1.4) Power on (when already powered on)
+	fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o on -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Success: Already ON
+
+	2) With ironic services down/in error
+	2.1) Status
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o status -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Failed: Unable to obtain correct plug status or plug is not available
+
+	2.2) Power off
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o off -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Failed: Unable to obtain correct plug status or plug is not available
+
+	2.3) Power on
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o on -n 2b40a642-3d7b-4a43-b6a2-57a3967ebb1c
+	Failed: Unable to obtain correct plug status or plug is not available
+
+	3) Non existing VM
+	$ fence_ironic -k $OS_AUTH_URL -l admin -p $OS_PASSWORD -o on -n foo
+	Failed: Unable to obtain correct plug status or plug is not available
+
+	4) Verified that password is never logged even when invoked with '-v'
+
+	5) Tested list command
+	$ fence_ironic -k http://192.0.2.1:5000/v2.0 -l admin -p 1ea6ac2d58b975455bf90eeb625ba57ac2c67766 -o list-status -C " "
+	ffa9ff02-20f1-45f4-b44c-1276d8120827 control-0 ON
+	79956ff7-8f9a-45a8-k90b-f711daf79bed control-2 ON
+	2b40a642-3d7b-4a43-b6a2-57a3967ebb1c compute-0 ON
+	70e07769-c4c5-4e0d-k134-41bca3f525d4 control-3 ON
+	b1db4b9b-da1a-4f3b-k980-88251eb5bdcd control-1 ON
+
+	Set up the fence agent like this:
+	hostmap=$(nova list | grep ctlplane | awk -F\| '{print $3 ":" $2}' | tr -d ' ' | tr '\n' ' ')
+	sudo pcs stonith create shooter fence_ironic auth-url=${OS_AUTH_URL} \
+	  login=${OS_USERNAME} passwd=${OS_PASSWORD} tenant-name=${OS_TENANT_NAME} \
+	  pcmk_host_map=\"${hostmap}\" op monitor interval=60s
+
+2016-10-17  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_compute: fix ConnectionError by using full module name
+
+2016-09-19  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fence_zvmip: Update XML metadata
+
+	fence_zvmip: Default shell timeout was float instead of integer
+
+	fencing: Add new types to RNG schema
+
+	fencing: Add types 'integer/second' for validation and metadata
+
+	fence_lpar: Handle exceptions when invalid output is read
+
+2016-09-12  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fence_lpar: Add support for IVM
+
+2016-08-22  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fence_cisco_ucs: Improve a method to obtain status
+	On Cisco UCS there are two attributes which are important for obtaining
+	correct power status of blade. One checks if slot is powered ON and other if
+	the node is pulled off the blade.
+
+2016-08-22  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #81 from oalbrigt/install-fix
+	Fix install issue for symlinked agents
+
+	Merge pull request #85 from oalbrigt/fence_mpath-unique-key-per-node
+	fence_mpath: update unique key info to say that it's per node and not per node/device
+
+2016-08-17  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_scsi: correct 'devive(s)' typo
+
+	fence_mpath: update unique key info to say that it's per node and not per node/device
+
+2016-08-15  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	build: Do not test paths in metadata
+
+2016-07-13  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Python 2.6 compatibility
+
+	Fix install issue for symlinked agents
+
+2016-07-06  Andrew Beekhof  <beekhof@Andrew-MBP16.local>
+
+	compute: Prevent use of undefined variable
+
+2016-06-29  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	build: clean-up of CLEAN_TARGET_ADDITIONAL
+
+	build: Do not fail if manual/ exists
+
+2016-06-27  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	build: Properly handle fence_ack_manual
+
+	build: Fix release scripts
+
+	build: Check if pywsman is installed
+
+2016-06-22  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #78 from oalbrigt/fence_compute-indent-fix
+	fence_compute: fix indent issue
+
+	Merge pull request #79 from oalbrigt/fence_apc-fix-connection-timed-out
+	fence_apc: fix for connection timed out issue
+
+2016-06-22  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_apc: fix for connection timed out issue
+
+2016-06-16  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #73 from vvidic/master
+	fence_sbd: fix return value of fence functions
+
+2016-06-14  Andrew Beekhof  <andrew@beekhof.net>
+
+	compute: Correctly handle installations without tagged flavours
+
+2016-06-07  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_compute: fix indent issue
+
+2016-06-06  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #74 from oalbrigt/parallel-build
+	Parallel build
+
+2016-06-02  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_pve: fix indentation
+
+	Parallel build
+
+2016-06-02  Valentin Vidic  <Valentin.Vidic@CARNet.hr>
+
+	fence_sbd: return value of fence functions is bool
+
+2016-05-11  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	Merge branch 'master' of https://github.com/ClusterLabs/fence-agents
+
+2016-06-02  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #34 from aspiers/fix/typos
+	Fix a couple of typos
+
+	Merge pull request #48 from credativ/install-fence_zvm.h
+	Install missing fence_zvm.h into release tarball
+
+	Merge pull request #75 from xtavras/fence_pve_fix
+	this fix allows to use dedicated user for fencing, not only root@pam
+
+	Merge pull request #69 from oalbrigt/onoff-cycle-cleanup
+	onoff/cycle cleanup
+
+2016-06-02  Andrew Beekhof  <andrew@beekhof.net>
+
+	compute: Allow evacuation to be disabled
+	instance-filtering = false
+	 - nothing happens
+
+	instance-filtering = true and no flavors or images tagged
+	- evacuate everything for compatibility with OSP 8
+
+	instance-filtering = true and at least one flavor or image is tagged
+	- evacuate only the instances derived from those flavors and/or images
+
+2016-05-27  Andrew Beekhof  <andrew@beekhof.net>
+
+	compute: Correctly enable filtering and fix related bugs
+	Enable tag based filtering when any images or flavors are found with the
+	'evacuable' tag.  Otherwise continue to evacuate all instances.
+
+	Also fix a number of bugs in the code that determines which instances
+	should be evacuated.
+
+2016-05-25  Stanislav Kopp  <stanislav.kopp@native-instruments.de>
+
+	this fix allows to use dedicated user for fencing, not only root@pam
+
+2016-05-25  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #67 from oalbrigt/scsi-shouldnt-reference-dm
+	Remove reference to /dev/dm-X devices
+
+	Merge pull request #68 from oalbrigt/fence_ipmilan-warning-about-success-before-node-is-powered-off
+	fence_ipmilan: add warning that cycle method can report success before node is powered off
+
+2016-05-18  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #70 from oalbrigt/python3-support
+	Python 3 support
+
+2016-05-10  Valentin Vidic  <Valentin.Vidic@CARNet.hr>
+
+	fence_sbd: fix return value of fence functions
+	sbd command exits with 0 on success but fence functions
+	should return True in this case
+
+2016-05-10  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_compute: Python 3 support
+
+	Merge remote-tracking branch 'upstream/master' into python3-support
+
+2016-05-09  Andrew Beekhof  <andrew@beekhof.net>
+
+	fence_compute: fix expected metadata
+
+	fence_compute: improved handling of compute nodes with/without FQDNs
+
+2016-04-28  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	Python 3 support
+
+2016-04-20  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	onoff/cycle cleanup
+
+	Remove reference to /dev/dm-X devices
+
+	fence_ipmilan: add warning that cycle method can report success before node is powered off
+
+2016-04-07  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #65 from oalbrigt/travis-openwsman-fix
+	travis: fix for openwsman test
+
+2016-04-06  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	travis: fix for openwsman test
+
+2016-03-22  Andrew Beekhof  <andrew@beekhof.net>
+
+	Merge pull request #37 from vuntz/compute-options
+	fence_compute: Add --insecure and --region-name command line arguments
+
+2016-03-17  Andrew Beekhof  <andrew@beekhof.net>
+
+	fence_compute: additional debug logging for when things go wrong
+
+	fence_compute: Correctly locate all instances to be evacuated
+
+2016-03-14  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #47 from credativ/zvm-help
+	Print fence_zvm --help to stdout and exit with status 0
+
+	Merge pull request #63 from disco-stu/fence_ipdu-syspath
+	fence_ipdu: fix hardcoded FENCEAGENTSLIBDIR.
+
+2016-03-13  Adrian Vondendriesch  <adrian.vondendriesch@credativ.de>
+
+	fence_ipdu: fix hardcoded FENCEAGENTSLIBDIR.
+	FENCEAGENTSLIBDIR was hardcoded to "/usr/share/fence".
+
+2016-03-03  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #49 from oalbrigt/fence_amt_ws
+	fence_amt_ws: new fence-agent
+
+2016-03-03  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_amt_ws: new fence-agent
+
+2016-02-11  Adam Spiers  <aspiers@suse.com>
+
+	fix "foce" typo
+
+	fix "it's" typo
+
+2016-02-09  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fence_cisco_ucs: Update XML metadata
+
+	fence_cisco_ucs: Add --missing-as-off
+
+	fence_cisco_ucs: Obtain 'status' from different attribute
+
+2016-02-06  Christoph Berg  <myon@debian.org>
+
+	Install missing fence_zvm.h into release tarball
+
+	Print fence_zvm --help to stdout and exit with status 0
+	This makes fence_zvm --help conform with the other fence agents
+	behavior.
+
+2016-02-01  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fence_cisco_ucs: Obtain status of device from different endpoint
+	Resolves: rhbz#1298430
+
+2016-01-28  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #40 from oalbrigt/fence_scsi-fix-typo-in-short-desc
+	fence_scsi: fix "persistentl" typo in short desc
+
+2016-01-28  Oyvind Albrigtsen  <oalbrigt@redhat.com>
+
+	fence_scsi: fix "persistentl" typo in short desc
+
+2016-01-27  marxsk  <mgrac@redhat.com>
+
+	Merge pull request #39 from kwaping/add_doc_link
+	docs: added link to cluster wiki in README
+
+2016-01-27  Ollie Ready  <kwaping@users.noreply.github.com>
+
+	docs: added link to cluster wiki in README
+
+2016-01-20  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fence_compute: Fix indentation
+	Mixed indentation is not allowed with 'python -tt'
+
+2016-01-07  Vincent Untz  <vuntz@suse.com>
+
+	fence_compute: Add --region-name command line argument
+	Useful for multi-region setups.
+
+	fence_compute: Add --insecure command line argument
+	This makes it possible to have fence_compute work with OpenStack
+	deployments with SSL certificates that can't be verified (can be the
+	case in test systems).
+
 2016-01-06  Marek 'marx' Grac  <mgrac@redhat.com>
 
 	fence_zvmip: Fix makefile to work with dist* targets
@@ -87,6 +649,32 @@
 
 	fix 'evacute' typo
 	This requires the corresponding fix in NovaCompute and NovaEvacuate.
+
+2015-11-16  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	fix
+
+	cleanup
+
+	next
+
+2015-11-12  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	refactor login
+
+2015-11-09  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	it is working: apc, lpar4, blade, brocade
+
+	working LPAR
+
+2015-11-05  Marek 'marx' Grac  <mgrac@redhat.com>
+
+	simplify
+
+	autodetect: simplify
+
+	Autodetect init
 
 2015-11-04  Marek 'marx' Grac  <mgrac@redhat.com>
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 import sys
 import stat
@@ -83,7 +83,7 @@ def set_status(conn, options):
 def run_cmd(options, cmd):
 	ret = {}
 
-	if options.has_key("--use-sudo"):
+	if "--use-sudo" in options:
 		prefix = options["--sudo-path"] + " "
 	else:
 		prefix = ""
@@ -169,7 +169,7 @@ def define_new_opts():
 		"help" : "-d, --devices=[devices]        List of devices to use for current operation",
 		"required" : "1",
 		"shortdesc" : "List of devices to use for current operation. Devices can \
-be comma-separated list of device-mapper multipath devices (eg. /dev/dm-3). \
+be comma-separated list of device-mapper multipath devices (eg. /dev/mapper/3600508b400105df70000e00000ac0000 or /dev/mapper/mpath1). \
 Each device must support SCSI-3 persistent reservations.",
 		"order": 1
 	}
@@ -219,8 +219,8 @@ def main():
 persistent reservations to control access multipath devices. Underlying \
 devices must support SCSI-3 persistent reservations (SPC-3 or greater) as \
 well as the \"preempt-and-abort\" subcommand.\nThe fence_mpath agent works by \
-having an unique key for each pair of node and device that has to be set also \
-in /etc/multipath.conf. Once registered, a single node will become the reservation holder \
+having a unique key for each node that has to be set in /etc/multipath.conf. \
+Once registered, a single node will become the reservation holder \
 by creating a \"write exclusive, registrants only\" reservation on the \
 device(s). The result is that only registered nodes may write to the \
 device(s). When a node failure occurs, the fence_mpath agent will remove the \

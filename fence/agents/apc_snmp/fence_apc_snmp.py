@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 # The Following agent has been tested on:
 # - APC Switched Rack PDU - SNMP v1
@@ -113,7 +113,7 @@ def apc_set_device(conn):
 	# First resolve type of APC
 	apc_type = conn.walk(OID_SYS_OBJECT_ID)
 
-	if not ((len(apc_type) == 1) and (agents_dir.has_key(apc_type[0][1]))):
+	if not ((len(apc_type) == 1) and (apc_type[0][1] in agents_dir)):
 		apc_type = [[None, None]]
 
 	device = agents_dir[apc_type[0][1]]
@@ -197,13 +197,13 @@ def main():
 	options = check_input(device_opt, process_input(device_opt))
 
         ## Support for -n [switch]:[plug] notation that was used before
-	if (options.has_key("--plug")) and (-1 != options["--plug"].find(":")):
+	if ("--plug" in options) and (-1 != options["--plug"].find(":")):
 		(switch, plug) = options["--plug"].split(":", 1)
 		if switch.isdigit() and plug.isdigit():
 			options["--switch"] = switch
 			options["--plug"] = plug
 
-	if not options.has_key("--switch"):
+	if "--switch" not in options:
 		options["--switch"] = "1"
 
 	docs = {}
@@ -213,6 +213,7 @@ which can be used with the APC network power switch or Tripplite PDU devices.\
 It logs into a device via SNMP and reboots a specified outlet. It supports \
 SNMP v1, v2c, v3 with all combinations of  authenticity/privacy settings."
 	docs["vendorurl"] = "http://www.apc.com"
+	docs["symlink"] = [("fence_tripplite_snmp", "Fence agent for Tripplife over SNMP")]
 	show_docs(options, docs)
 
 	# Operate the fencing device

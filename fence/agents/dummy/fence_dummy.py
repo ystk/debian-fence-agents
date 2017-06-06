@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!@PYTHON@ -tt
 
 import sys, random
 import logging
@@ -42,7 +42,7 @@ def set_power_status_file(conn, options):
 def get_power_status_fail(conn, options):
 	outlets = get_outlets_fail(conn, options)
 
-	if len(outlets) == 0 or not options.has_key("--plug"):
+	if len(outlets) == 0 or "--plug" not in options:
 		fail_usage("Failed: You have to enter existing machine!")
 	else:
 		return outlets[options["--plug"]][0]
@@ -69,7 +69,7 @@ def get_outlets_fail(conn, options):
 	if options.get("--action", None) == "list":
 		result["fake_port_1"] = [plug_status, "fake"]
 		result["fake_port_2"] = [plug_status, "fake"]
-	elif not options.has_key("--plug"):
+	elif "--plug" not in options:
 		fail_usage("Failed: You have to enter existing machine!")
 	else:
 		port = options["--plug"]
@@ -78,7 +78,7 @@ def get_outlets_fail(conn, options):
 	return result
 
 def main():
-	device_opt = ["no_password", "status_file", "random_sleep_range", "type", "port"]
+	device_opt = ["no_password", "status_file", "random_sleep_range", "type", "no_port"]
 
 	atexit.register(atexit_handler)
 
@@ -111,12 +111,6 @@ def main():
 		"order": 1
 		}
 
-	pinput = process_input(device_opt)
-	if (pinput.has_key("--type") and pinput["--type"] == "file") or (pinput.has_key("--type") == False):
-		# hack to have fence agents that require ports 'fail' and one that do not 'file'
-		device_opt.remove("port")
-		device_opt.remove("separator")
-
 	options = check_input(device_opt, process_input(device_opt))
 
 	docs = {}
@@ -128,7 +122,7 @@ def main():
 	run_delay(options)
 
 	# random sleep for testing
-	if options.has_key("--random_sleep_range"):
+	if "--random_sleep_range" in options:
 		val = int(options["--random_sleep_range"])
 		ran = random.randint(1, val)
 		logging.info("Random sleep for %d seconds\n", ran)
